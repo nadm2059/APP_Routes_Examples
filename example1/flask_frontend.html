@@ -1,0 +1,64 @@
+<!DOCTYPE html> <!-- Declares this file as an HTML5 document -->
+<html> <!-- Opens the HTML root element -->
+<head> <!-- Contains metadata and document settings -->
+    <title>Flask Todo List</title> <!-- Sets the title of the page shown in the browser tab -->
+</head> <!-- Ends the head section -->
+<body> <!-- Opens the body, which contains the visible content of the page -->
+    <h1>Todo List</h1> <!-- Main heading for the page -->
+    <input id="task" placeholder="New task"> <!-- Input field for entering a new task, with placeholder text -->
+    <button onclick="addTodo()">Add</button> <!-- Button that triggers addTodo() when clicked -->
+    <ul id="todoList"></ul> <!-- Unordered list where todo items will be displayed -->
+
+    <script> <!-- Starts JavaScript section -->
+        // Function to load and display all todos from the server
+        async function loadTodos() {
+            try {
+                const res = await fetch('/api/todos'); // Sends GET request to '/api/todos' endpoint
+                if (!res.ok) throw new Error('Failed to fetch todos'); // Throws error if request fails
+                const todos = await res.json(); // Parses the response as JSON
+                // Updates the HTML of the todoList <ul> by mapping each todo to an <li> element with a delete button
+                document.getElementById('todoList').innerHTML = todos.map(t => 
+                    `<li>${t.task} <button onclick="deleteTodo(${t.id})">X</button></li>`
+                ).join(''); // Joins array of list items into a single string
+            } catch (err) {
+                console.error(err); // Logs any errors to the console
+            }
+        }
+
+        // Function to add a new todo to the list
+        async function addTodo() {
+            const taskInput = document.getElementById('task'); // Gets the input element
+            const task = taskInput.value.trim(); // Reads the input value and trims whitespace
+            if (!task) return; // If the task is empty, stop execution
+
+            try {
+                // Sends POST request to '/api/todos' with task data in JSON format
+                const res = await fetch('/api/todos', {
+                    method: 'POST', // HTTP method
+                    headers: {'Content-Type': 'application/json'}, // Tells server we're sending JSON
+                    body: JSON.stringify({task}) // Converts task into JSON string
+                });
+                if (!res.ok) throw new Error('Failed to add todo'); // Throws error if request fails
+                taskInput.value = ''; // Clears the input field
+                await loadTodos(); // Reloads the todo list from server
+            } catch (err) {
+                console.error(err); // Logs any errors
+            }
+        }
+
+        // Function to delete a todo by its ID
+        async function deleteTodo(id) {
+            try {
+                // Sends DELETE request to '/api/todos/:id'
+                const res = await fetch(`/api/todos/${id}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete todo'); // Throws error if request fails
+                await loadTodos(); // Reloads the todo list
+            } catch (err) {
+                console.error(err); // Logs any errors
+            }
+        }
+
+        loadTodos(); // Loads the todo list when the page first opens
+    </script> <!-- Ends JavaScript section -->
+</body> <!-- Ends the body section -->
+</html> <!-- Ends the HTML document -->

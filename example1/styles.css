@@ -1,0 +1,37 @@
+h1 {
+    color: green;
+    font-family: Arial, sans-serif;
+    font-style: bold;
+    text-decoration:underline;
+    background-color: yellow;
+    text-align: center;
+    padding: 10px;
+
+
+
+}
+input {
+    color:aqua;
+    font-size: 20px;
+    padding: 5px;
+
+}
+button {
+    background-color: plum;
+    font-size: 20px;
+    padding: 5px;
+
+}
+
+li {
+    color: darkblue;
+    font-size: 20px;
+    font-style: italic;
+    padding: 10px;
+}
+li:hover {
+    color: green;
+}
+body {
+    background-color: lightpink;
+}

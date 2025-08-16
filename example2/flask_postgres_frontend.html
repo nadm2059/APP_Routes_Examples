@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Todo List</title>
+</head>
+<body>
+    <h1>Todo List</h1>
+    <input id="task" placeholder="New task">
+    <button onclick="addTodo()">Add</button>
+    <ul id="todoList"></ul>
+
+    <script>
+        const baseURL = "http://127.0.0.1:5000";
+
+        async function loadTodos() {
+            const res = await fetch(`${baseURL}/api/todos`);
+            const todos = await res.json();
+            document.getElementById('todoList').innerHTML = todos.map(t => 
+                `<li>${t.task} <button onclick="deleteTodo(${t.id})">X</button></li>`
+            ).join('');
+        }
+
+        async function addTodo() {
+            const task = document.getElementById('task').value;
+            await fetch(`${baseURL}/api/todos`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({task})
+            });
+            loadTodos();
+        }
+
+        async function deleteTodo(id) {
+            await fetch(`${baseURL}/api/todos/${id}`, { method: 'DELETE' });
+            loadTodos();
+        }
+
+        loadTodos();
+    </script>
+</body>
+</html>

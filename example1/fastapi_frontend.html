@@ -1,0 +1,45 @@
+<!DOCTYPE html> <!-- Declares the document as HTML5 -->
+<html> <!-- Opens the HTML document -->
+<head> <!-- Metadata and page settings go here -->
+    <title>FastAPI Todo List</title> <!-- Title displayed in the browser tab -->
+</head> <!-- End of the head section -->
+<body> <!-- Start of the body, where visible content is placed -->
+    <h1>Todo List</h1> <!-- Main heading of the page -->
+    <input id="task" placeholder="New task"> <!-- Input field for typing a new task -->
+    <button onclick="addTodo()">Add</button> <!-- Button that calls addTodo() when clicked -->
+    <ul id="todoList"></ul> <!-- Unordered list where todos will be displayed -->
+
+    <script> <!-- Start JavaScript code block -->
+        const baseURL = "http://127.0.0.1:8000"; // Base URL for the FastAPI backend
+
+        // Function to load all todos from the backend
+        async function loadTodos() {
+            const res = await fetch(`${baseURL}/api/todos`); // Send GET request to backend
+            const todos = await res.json(); // Parse JSON response
+            // Replace the content of todoList with <li> elements for each todo
+            document.getElementById('todoList').innerHTML = todos.map(t => 
+                `<li>${t.task} <button onclick="deleteTodo(${t.id})">X</button></li>`
+            ).join(''); // Join list items into a single string
+        }
+
+        // Function to add a new todo
+        async function addTodo() {
+            const task = document.getElementById('task').value; // Get value from input field
+            await fetch(`${baseURL}/api/todos`, { // Send POST request to backend
+                method: 'POST', // HTTP method POST for creating a todo
+                headers: {'Content-Type': 'application/json'}, // JSON request body
+                body: JSON.stringify({task}) // Convert object to JSON string
+            });
+            loadTodos(); // Refresh todo list after adding
+        }
+
+        // Function to delete a todo by ID
+        async function deleteTodo(id) {
+            await fetch(`${baseURL}/api/todos/${id}`, { method: 'DELETE' }); // Send DELETE request
+            loadTodos(); // Refresh todo list after deletion
+        }
+
+        loadTodos(); // Load todos when the page first loads
+    </script> <!-- End JavaScript code -->
+</body> <!-- End of body -->
+</html> <!-- End of HTML document -->

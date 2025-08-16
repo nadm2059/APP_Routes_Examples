@@ -1,0 +1,47 @@
+<!DOCTYPE html> <!-- Declares this file as HTML5 -->
+<html> <!-- Opens the HTML document -->
+<head> <!-- Head section for metadata, styles, and title -->
+    <title>Express Todo List</title> <!-- Title shown in the browser tab -->
+    <link rel="stylesheet" href="styles.css"> <!-- Links an external CSS file for styling -->
+</head> <!-- End of head section -->
+<body> <!-- Start of body, where visible content appears -->
+    <h1>Todo List</h1> <!-- Main heading for the page -->
+    <input id="task" placeholder="New task"> <!-- Input field for entering a new task, with placeholder text -->
+    <button onclick="addTodo()">Add</button> <!-- Button that calls addTodo() when clicked -->
+    <ul id="todoList"></ul> <!-- Unordered list where todo items will be dynamically inserted -->
+
+    <script> <!-- Start of JavaScript code -->
+        const baseURL = "http://localhost:3000"; // Base URL for the Express backend server
+
+        // Function to fetch and display all todos
+        async function loadTodos() {
+            const res = await fetch(`${baseURL}/api/todos`); // Send GET request to backend
+            const todos = await res.json(); // Parse JSON response into an array
+            // Replace the HTML inside todoList with <li> items, each having a delete button
+            document.getElementById('todoList').innerHTML = todos.map(t => 
+                `<li>${t.task} <button onclick="deleteTodo(${t.id})">X</button></li>`
+            ).join(''); // Join array into a single string of HTML
+        }
+
+        // Function to add a new todo
+        async function addTodo() {
+            const task = document.getElementById('task').value; // Get the value from input field
+            await fetch(`${baseURL}/api/todos`, { // Send POST request to backend
+                method: 'POST', // HTTP method POST for adding a todo
+                headers: {'Content-Type': 'application/json'}, // Send data as JSON
+                body: JSON.stringify({task}) // Convert task object to JSON string
+            });
+            loadTodos(); // Reload todos after adding new one
+        }
+
+        // Function to delete a todo by its ID
+        async function deleteTodo(id) {
+            await fetch(`${baseURL}/api/todos/${id}`, { method: 'DELETE' }); // Send DELETE request
+            loadTodos(); // Reload todos after deletion
+        }
+
+        loadTodos(); // Load todos when page first loads
+    </script> <!-- End of JavaScript -->
+    
+</body> <!-- End of body -->
+</html> <!-- End of HTML document -->

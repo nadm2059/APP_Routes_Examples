@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FastAPI + PostgreSQL Todo List</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 400px;
+            margin: auto;
+            padding-top: 20px;
+        }
+        input {
+            padding: 8px;
+            width: 70%;
+        }
+        button {
+            padding: 8px;
+            margin-left: 5px;
+        }
+        ul {
+            padding-left: 0;
+        }
+        li {
+            list-style: none;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Todo List</h1>
+    <input id="task" placeholder="New task">
+    <button onclick="addTodo()">Add</button>
+    <ul id="todoList"></ul>
+
+    <script>
+        const baseURL = "http://127.0.0.1:8000"; // Backend URL
+
+        // Load all todos from backend
+        async function loadTodos() {
+            const res = await fetch(`${baseURL}/api/todos`);
+            const todos = await res.json();
+            document.getElementById('todoList').innerHTML = todos.map(t =>
+                `<li>${t.task} <button onclick="deleteTodo(${t.id})">X</button></li>`
+            ).join('');
+        }
+
+        // Add a new todo
+        async function addTodo() {
+            const task = document.getElementById('task').value.trim();
+            if (!task) return alert("Please enter a task");
+            await fetch(`${baseURL}/api/todos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task })
+            });
+            document.getElementById('task').value = '';
+            loadTodos();
+        }
+
+        // Delete a todo
+        async function deleteTodo(id) {
+            await fetch(`${baseURL}/api/todos/${id}`, { method: 'DELETE' });
+            loadTodos();
+        }
+
+        // Load todos when page loads
+        loadTodos();
+    </script>
+
+</body>
+</html>
