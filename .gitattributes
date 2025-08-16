@@ -1,0 +1,1 @@
+example2/journal/*.000000000* filter=lfs diff=lfs merge=lfs -text
